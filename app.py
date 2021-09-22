@@ -2,6 +2,7 @@ from flask import Flask
 from flask import jsonify
 from flask import request
 from flask import abort
+from flask import render_template
 app = Flask(__name__)
 
 banks = [
@@ -11,7 +12,7 @@ banks = [
         'interest_rate' : 10.00,
         'maximum_loan' : 100000,
         'minimum_down_payment' : 20.00,
-        'loan_term' : 12
+        'loan_term' : 12,
     }
 ]
 
@@ -41,7 +42,7 @@ def create_bank():
     banks.append(bank)
     return jsonify({'bank': bank}), 201
 
-@app.route('api/edit_bank/<int:bank_id>', methods=['PUT'])
+@app.route('/api/edit_bank/<int:bank_id>', methods=['PUT'])
 def edit_bank(bank_id):
     if not bank_id:
         abort(404)
@@ -65,7 +66,7 @@ def edit_bank(bank_id):
     bank[0]['loan_term'] = request.json.get('loan_term', bank[0]['loan_term'])
     return jsonify({'bank' : bank[0]})
 
-@app.route('/api/delete_bank<int:bank_id>', metods=['DELETE'])
+@app.route('/api/delete_bank/<int:bank_id>', methods=['DELETE'])
 def delete_bank(bank_id):
     bank = filter(lambda temp: temp['id'] == bank_id, banks)
     if len(bank) == 0:
@@ -78,7 +79,11 @@ def delete_bank(bank_id):
 
 @app.route('/')
 def index():
-    return "Hello"
+    return render_template('index.html')
+
+@app.route('/banks')
+def banks_template():
+    return render_template('banks.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
