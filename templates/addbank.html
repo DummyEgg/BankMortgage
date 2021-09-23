@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+</style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="topnav">
+        <a class="active" href="/">Home</a>
+        <a href="banks">Banks List</a>
+        <a href="/addbank">Add Bank</a>
+        <a href="/edit_bank">Edit Bank</a>
+        <a href="/delete_bank">Delete Bank</a>
+        <a href="/mortgage">Mortgage Calculator</a>
+      </div> 
+<script>
+    function addBank(){
+        var xhr = new XMLHttpRequest()
+        var name = document.getElementById('name').value
+        var interest_rate = document.getElementById('interest_rate').value
+        var maximum_loan = document.getElementById('maximum_loan').value
+        var minimum_down_payment = document.getElementById('minimum_down_payment').value
+        var loan_term = document.getElementById('loan_term').value
+        var body = JSON.stringify({
+            'name' : name,
+            'interest_rate' : interest_rate,
+            'maximum_loan' : maximum_loan,
+            'minimum_down_payment' : minimum_down_payment,
+            'loan_term' : loan_term
+        })
+        console.log(body)
+        xhr.open("POST", '/api/add_bank', true)
+        xhr.setRequestHeader("Content-type", "application/json")
+        xhr.send(body)
+        window.open('/bankadded')
+    }
+</script>
+
+
+<center><h1>Adding a Bank</h1></center>
+<form action="javascript:addBank()">
+    <ul>
+        <li>
+            <label for="name">Name:</label>
+            <input type = "text" id = "name" name="name">
+        </li>
+        <li>
+            <label for="interest_rate">Interest Rate(%):</label>
+            <input type="number" step="0.01" name="interest_rate" id="interest_rate">
+        </li>
+        <li>
+            <label for="maximum_loan">Maximum Loan:</label>
+            <input type="number" name="maximum_loan" id="maximum_loan">
+        </li>
+        <li>
+            <label for="minimum_down_payment">Minimum Down Payment(%)</label>
+            <input type="number" name="minimum_down_payment" id="minimum_down_payment" step="0.01">
+        </li>
+        <li>
+            <label for="loan_term">Loan Term:</label>
+            <input type="number" name="loan_term" id="loan_term">
+        </li>
+        <li class="button">
+            <button type="submit">Add a Bank!</button>
+        </li>
+    </ul>
+</form>
+
+</body>
+</html> 

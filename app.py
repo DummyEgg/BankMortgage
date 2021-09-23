@@ -27,8 +27,9 @@ def get_task(bank_id):
         abort(404)
     return jsonify({'bank': bank[0]})
 
-@app.route('/api/create_bank', methods=['POST'])
-def create_bank():
+@app.route('/api/add_bank', methods=['POST'])
+def add_bank():
+    print(request.json)
     if not request.json:
         abort(400)
     bank = {
@@ -84,6 +85,14 @@ def index():
 @app.route('/banks')
 def banks_template():
     return render_template('banks.html')
+
+@app.route('/addbank')
+def addbank_template():
+    return render_template('addbank.html')
+
+@app.route('/bankadded')
+def bankadded_template():
+    return render_template('addedbank.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
