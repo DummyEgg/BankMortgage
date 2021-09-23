@@ -1,0 +1,143 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+          background-color: #dddddd;
+        }
+        body {
+          margin: 0;
+          font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        .topnav {
+          overflow: hidden;
+          background-color: #333;
+        }
+        
+        .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+          font-size: 17px;
+        }
+        
+        .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+        }
+        
+        .topnav a.active {
+          background-color: #04AA6D;
+          color: white;
+        }
+        #searchInput{
+            background-image: url('/css/searchicon.png'); 
+            background-position: 10px 12px; 
+            background-repeat: no-repeat; 
+            width: 100%; 
+            font-size: 16px; 
+            padding: 12px 20px 12px 40px; 
+            border: 1px solid #ddd; 
+            margin-bottom: 12px; 
+        }
+        </style>
+            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    </head>
+    <body>
+        <div class="topnav">
+            <a class="active" href="/">Home</a>
+            <a href="banks">Banks List</a>
+            <a href="/addbank">Add Bank</a>
+            <a href="/edit_bank">Edit Bank</a>
+            <a href="/delete_bank">Delete Bank</a>
+            <a href="/mortgage">Mortgage Calculator</a>
+          </div> 
+          <input type="text" id="searchInput" onkeyup="searchBar()" placeholder="Search for banks...">
+          <div id='bankData'>
+
+          </div>
+          <script>
+              function addHeaders(table, keys){
+                var row = table.insertRow();
+                for (var i = 0; i < keys.length; ++i){
+                    var cell = row.insertCell();
+                    cell.appendChild(document.createTextNode(keys[i]))
+                }
+            }
+            function displayData(data){
+                //console.log(data.banks)
+                var table = document.createElement('table')
+                for (var i = 0; i < data.banks.length; ++i){
+                    var bank = data.banks[i]
+                    console.log(bank)
+                    var orderArrayHeader = ["name","interest_rate","maximum_loan","minimum_down_payment", "loan_term"];
+                
+                    if (i===0){
+                        var thead = document.createElement('thead')
+                        table.appendChild(thead)
+                        for (var j = 0; j < orderArrayHeader.length; ++j){
+                            thead.appendChild(document.createElement('th')).
+                            appendChild(document.createTextNode(orderArrayHeader[j]))
+                        }
+                    }
+                    var row = table.insertRow();
+                    for (var j = 0; j < orderArrayHeader.length; ++j){
+                        console.log(orderArrayHeader[j])
+                        var cell = row.insertCell();
+                        cell.appendChild(document.createTextNode(bank[orderArrayHeader[j]]))
+                    }
+                }    
+                console.log(table)
+                table.style.border = 1
+                table.id = "banksTable"
+                document.getElementById('bankData').appendChild(table)
+            }
+            function searchBar(){
+                var input, filter, table, tr, td, i, txtValue
+                input = document.getElementById('searchInput')
+                filter = input.value.toUpperCase()
+                table = document.getElementById("banksTable")
+                tr = table.getElementsByTagName("tr")
+                for (i = 0; i < tr.length; ++i){
+                    td = tr[i].getElementsByTagName("td")[0]
+                    if (td){
+                        txtValue = td.textContent || td.innerText
+                        if (txtValue.toUpperCase().indexOf(filter) > -1){
+                            tr[i].style.display = ""
+                        } else {
+                            tr[i].style.display = "None"
+                        }
+                    }
+                }
+            }
+            fetch('/api/get_banks')
+            .then(function (response){
+                console.log(response)
+                return response.json()
+            })
+            .then(function (data){
+                displayData (data)
+                //console.log(data)
+            })
+            .catch(function (error){
+                console.log("Error " + error)
+            })
+          </script>
+
+    </body>
+</html>

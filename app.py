@@ -30,6 +30,9 @@ def get_task(bank_id):
 @app.route('/api/add_bank', methods=['POST'])
 def add_bank():
     print(request.json)
+    for key in request.json:
+        if request.json[key] is None:
+            abort(400)
     if not request.json:
         abort(400)
     bank = {
@@ -93,6 +96,10 @@ def addbank_template():
 @app.route('/bankadded')
 def bankadded_template():
     return render_template('addedbank.html')
+
+@app.route('/editbank')
+def editbank_template():
+    return render_template('editbank.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
