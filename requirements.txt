@@ -7,3 +7,4 @@ distribute==0.6.24
 gunicorn==0.14.2
 requests==0.11.1
 setuptools==58.1.0 
+PyFlakes
