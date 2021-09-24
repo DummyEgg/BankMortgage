@@ -1,8 +1,7 @@
 <html>
     <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            table {
+                table {
           font-family: arial, sans-serif;
           border-collapse: collapse;
           width: 100%;
@@ -56,88 +55,64 @@
             margin-bottom: 12px; 
         }
         </style>
-            <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
     </head>
     <body>
         <div class="topnav">
             <a class="active" href="/">Home</a>
-            <a href="banks">Banks List</a>
+            <a href="/banks">Banks List</a>
             <a href="/addbank">Add Bank</a>
             <a href="/edit_bank">Edit Bank</a>
             <a href="/delete_bank">Delete Bank</a>
             <a href="/mortgage">Mortgage Calculator</a>
-          </div> 
-          <input type="text" id="searchInput" onkeyup="searchBar()" placeholder="Search for banks...">
-          <div id='bankData'>
-
           </div>
+          <form action="javascript:editbank()">
+                <input id="bank_id" type="number" placeholder="Banks ID">
+                <li>
+                    <label for="name">New Name:</label>
+                    <input type = "text" id = "name" name="name">
+                </li>
+                <li>
+                    <label for="interest_rate">New Interest Rate(%):</label>
+                    <input type="number" step="0.01" name="interest_rate" id="interest_rate">
+                </li>
+                <li>
+                    <label for="maximum_loan">New Maximum Loan:</label>
+                    <input type="number" name="maximum_loan" id="maximum_loan">
+                </li>
+                <li>
+                    <label for="minimum_down_payment">New Minimum Down Payment(%)</label>
+                    <input type="number" name="minimum_down_payment" id="minimum_down_payment" step="0.01">
+                </li>
+                <li>
+                    <label for="loan_term">New Loan Term:</label>
+                    <input type="number" name="loan_term" id="loan_term">
+                </li>
+                <li class="button">
+                    <button type="submit">Edit a Bank!</button>
+                </li>
+          </form>
           <script>
-              function addHeaders(table, keys){
-                var row = table.insertRow();
-                for (var i = 0; i < keys.length; ++i){
-                    var cell = row.insertCell();
-                    cell.appendChild(document.createTextNode(keys[i]))
-                }
-            }
-            function displayData(data){
-                //console.log(data.banks)
-                var table = document.createElement('table')
-                for (var i = 0; i < data.banks.length; ++i){
-                    var bank = data.banks[i]
-                    console.log(bank)
-                    var orderArrayHeader = ["name","interest_rate","maximum_loan","minimum_down_payment", "loan_term"];
-                
-                    if (i===0){
-                        var thead = document.createElement('thead')
-                        table.appendChild(thead)
-                        for (var j = 0; j < orderArrayHeader.length; ++j){
-                            thead.appendChild(document.createElement('th')).
-                            appendChild(document.createTextNode(orderArrayHeader[j]))
-                        }
-                    }
-                    var row = table.insertRow();
-                    for (var j = 0; j < orderArrayHeader.length; ++j){
-                        console.log(orderArrayHeader[j])
-                        var cell = row.insertCell();
-                        cell.appendChild(document.createTextNode(bank[orderArrayHeader[j]]))
-                    }
-                }    
-                console.log(table)
-                table.style.border = 1
-                table.id = "banksTable"
-                document.getElementById('bankData').appendChild(table)
-            }
-            function searchBar(){
-                var input, filter, table, tr, td, i, txtValue
-                input = document.getElementById('searchInput')
-                filter = input.value.toUpperCase()
-                table = document.getElementById("banksTable")
-                tr = table.getElementsByTagName("tr")
-                for (i = 0; i < tr.length; ++i){
-                    td = tr[i].getElementsByTagName("td")[0]
-                    if (td){
-                        txtValue = td.textContent || td.innerText
-                        if (txtValue.toUpperCase().indexOf(filter) > -1){
-                            tr[i].style.display = ""
-                        } else {
-                            tr[i].style.display = "None"
-                        }
-                    }
-                }
-            }
-            fetch('/api/get_banks')
-            .then(function (response){
-                console.log(response)
-                return response.json()
-            })
-            .then(function (data){
-                displayData (data)
-                //console.log(data)
-            })
-            .catch(function (error){
-                console.log("Error " + error)
-            })
-          </script>
-
+              function editbank(){
+                var xhr = new XMLHttpRequest()
+                var id = document.getElementById('bank_id').value
+                var name = document.getElementById('name').value
+                var interest_rate = document.getElementById('interest_rate').value
+                var maximum_loan = document.getElementById('maximum_loan').value
+                var minimum_down_payment = document.getElementById('minimum_down_payment').value
+                var loan_term = document.getElementById('loan_term').value
+                var body = JSON.stringify({
+                    'name' : name,
+                    'interest_rate' : parseInt(interest_rate),
+                    'maximum_loan' : parseInt(maximum_loan),
+                    'minimum_down_payment' : parseInt(minimum_down_payment),
+                    'loan_term' : parseInt(loan_term)
+                })
+                xhr.open("PUT", "api/edit_bank/" + id, true)
+                xhr.setRequestHeader("Content-type", "application/json")
+                xhr.send(body)
+              }
+          </script> 
     </body>
 </html>

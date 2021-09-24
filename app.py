@@ -48,20 +48,26 @@ def add_bank():
 
 @app.route('/api/edit_bank/<int:bank_id>', methods=['PUT'])
 def edit_bank(bank_id):
-    if not bank_id:
+    print(bank_id)
+    print(request.json)
+    if bank_id is None:
         abort(404)
     if not request.json:
         abort(400)
-    bank = filter(lambda temp: temp['id'] == bank_id, banks)
+    bank = list(filter(lambda temp: temp['id'] == bank_id, banks))
     if 'name' in request.json and type(request.json['name']) != str:
         abort(400)
-    if 'interest_rate' in request.json and type(request.json['interest_rate']) is not float:
+    if 'interest_rate' in request.json and type(request.json['interest_rate']) is not int:
+        print('a')
         abort(400)
     if 'maximum_loan' in request.json and type(request.json['maximum_loan']) is not int:
+        print('b')
         abort(400)
-    if 'minimum_down_payment' in request.json and type(request.json['minimum_down_payment']) is not float:
+    if 'minimum_down_payment' in request.json and type(request.json['minimum_down_payment']) is not int:
+        print('c')
         abort(400)
     if 'loan_term' in request.json and type(request.json['loan_term']) is not int:
+        print('d')
         abort(400)
     bank[0]['name'] = request.json.get('name', bank[0]['name'])
     bank[0]['interest_rate'] = request.json.get('interest_rate', bank[0]['interest_rate'])
@@ -72,7 +78,7 @@ def edit_bank(bank_id):
 
 @app.route('/api/delete_bank/<int:bank_id>', methods=['DELETE'])
 def delete_bank(bank_id):
-    bank = filter(lambda temp: temp['id'] == bank_id, banks)
+    bank = list(filter(lambda temp: temp['id'] == bank_id, banks))
     if len(bank) == 0:
         abort(404)
     banks.remove(bank[0])
@@ -97,9 +103,13 @@ def addbank_template():
 def bankadded_template():
     return render_template('addedbank.html')
 
-@app.route('/editbank')
+@app.route('/edit_bank')
 def editbank_template():
     return render_template('editbank.html')
+
+@app.route('/delete_bank')
+def delete_bank_template():
+    return render_template('delete_bank.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
