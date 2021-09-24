@@ -111,5 +111,9 @@ def editbank_template():
 def delete_bank_template():
     return render_template('delete_bank.html')
 
+@app.route('/mortgage')
+def mortgage_template():
+    return render_template('mortgage.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
