@@ -2,10 +2,6 @@ Flask
 flask
 Jinja2
 Werkzeug
-certifi
-chardet
-distribute
-gunicorn
 requests
 setuptools
 PyFlakes
