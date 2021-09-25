@@ -79,15 +79,17 @@
                     interestRate = bankData[i]['interest_rate'] * 1.00
                     if (initialLoan > bankData[i]['maximum_loan']){
                         alert("Initial Payment is too big")
+                        return
                     }
                     if (downPayment < initialLoan * bankData[i]['minimum_down_payment']/100){
                         alert('Down Payment too low')
+                        return
                     }
                     break;
                 }
           }
           console.log(interestRate)
-          monthlyPayment = (initialLoan * (interestRate/12.00))
+          monthlyPayment = ((initialLoan-downPayment) * (interestRate/1200.00) * Math.pow(1 + interestRate/1200, numberOfPayments))/(Math.pow(1+interestRate/1200, numberOfPayments)-1)
           result = document.getElementById("monthly_payment")
           result.innerText = "Monthly Payment: " + monthlyPayment
       }
