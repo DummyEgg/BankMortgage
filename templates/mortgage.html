@@ -78,7 +78,7 @@
                     numberOfPayments = bankData[i]['loan_term'] * 1.00
                     interestRate = bankData[i]['interest_rate'] * 1.00
                     if (initialLoan > bankData[i]['maximum_loan']){
-                        alert("Initial Payment is too big")
+                        alert("Initial Loan is too big")
                         return
                     }
                     if (downPayment < initialLoan * bankData[i]['minimum_down_payment']/100){
