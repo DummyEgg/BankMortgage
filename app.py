@@ -3,29 +3,49 @@ from flask import jsonify
 from flask import request
 from flask import abort
 from flask import render_template
+from flask.json import JSONEncoder
+from database import create_connection, db_query, db_read_query
+
+connection = create_connection("app.sqlite")
 app = Flask(__name__)
 
-banks = [
-    {
-        'id' : 0,
-        'name' : 'Test Bank',
-        'interest_rate' : 10.00,
-        'maximum_loan' : 100000,
-        'minimum_down_payment' : 20.00,
-        'loan_term' : 12,
-    }
-]
+initialQuery = """
+CREATE TABLE IF NOT EXISTS banks(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    interest_rate INTEGER NOT NULL,
+    maximum_loan INTEGER NOT NULL,
+    minimum_down_payment INTEGER NOT NULL,
+    loan_term INTEGER NOT NULL
+);
+"""
+db_query(connection, initialQuery)
+
 
 @app.route('/api/get_banks', methods=['GET'])
-def get_tasks():
+def get_banks():
+    query = "SELECT * from banks"
+    db_banks = db_read_query(connection, query)
+    banks = []
+    keys = ['id', 'name', 'interest_rate', 'maximum_loan', 'minimum_down_payment', 'loan_term']
+    for val in db_banks:
+        bank = {}
+        for i in range(len(val)):
+            bank[keys[i]] = val[i]
+        banks.append(bank)
     return jsonify({'banks' : banks})
 
 @app.route('/api/get_bank/<int:bank_id>', methods=['GET'])
-def get_task(bank_id):
-    bank = filter(lambda temp: temp['id'] == bank_id, banks)
-    if len(bank) == 0:
-        abort(404)
-    return jsonify({'bank': bank[0]})
+def get_bank(bank_id):
+    query = f"""
+    SELECT * from users WHERE id = {bank_id} 
+    """
+    db_bank = db_read_query(connection, query)
+    bank = {}
+    keys = ['id', 'name', 'interest_rate', 'maximum_loan', 'minimum_down_payment', 'loan_term']
+    for i in range(len(db_bank)):
+        bank[keys[i]] = db_bank[i]
+    return jsonify({'bank': bank})
 
 @app.route('/api/add_bank', methods=['POST'])
 def add_bank():
@@ -35,53 +55,35 @@ def add_bank():
             abort(400)
     if not request.json:
         abort(400)
-    bank = {
-        'id': banks[-1]['id'] + 1,
-        'name': request.json['name'],
-        'interest_rate' : request.json['interest_rate'],
-        'maximum_loan' : request.json['maximum_loan'],
-        'minimum_down_payment' : request.json['minimum_down_payment'],
-        'loan_term' : request.json['loan_term']
-    }
-    banks.append(bank)
-    return jsonify({'bank': bank}), 201
+    query = f"""
+    INSERT INTO 
+        banks (name, interest_rate, maximum_loan, minimum_down_payment, loan_term)
+    VALUES
+    ('{request.json['name']}', {request.json['interest_rate']}, {request.json['maximum_loan']}, {request.json['minimum_down_payment']}, {request.json['loan_term']})
+    """
+    db_query(connection, query)
+    return "bank added",201
 
 @app.route('/api/edit_bank/<int:bank_id>', methods=['PUT'])
 def edit_bank(bank_id):
-    print(bank_id)
-    print(request.json)
-    if bank_id is None:
-        abort(404)
-    if not request.json:
-        abort(400)
-    bank = list(filter(lambda temp: temp['id'] == bank_id, banks))
-    if 'name' in request.json and type(request.json['name']) != str:
-        abort(400)
-    if 'interest_rate' in request.json and type(request.json['interest_rate']) is not int:
-        print('a')
-        abort(400)
-    if 'maximum_loan' in request.json and type(request.json['maximum_loan']) is not int:
-        print('b')
-        abort(400)
-    if 'minimum_down_payment' in request.json and type(request.json['minimum_down_payment']) is not int:
-        print('c')
-        abort(400)
-    if 'loan_term' in request.json and type(request.json['loan_term']) is not int:
-        print('d')
-        abort(400)
-    bank[0]['name'] = request.json.get('name', bank[0]['name'])
-    bank[0]['interest_rate'] = request.json.get('interest_rate', bank[0]['interest_rate'])
-    bank[0]['maximum_loan'] = request.json.get('maximum_loan', bank[0]['maximum_loan'])
-    bank[0]['minimum_down_payment'] = request.json.get('minimum_down_payment', bank[0]['minimum_down_payment'])
-    bank[0]['loan_term'] = request.json.get('loan_term', bank[0]['loan_term'])
-    return jsonify({'bank' : bank[0]})
+    query = f"""
+    UPDATE
+        banks
+    SET
+        name = "{request.json['name']}",
+        interest_rate = {request.json['interest_rate']},
+        minimum_down_payment = {request.json['minimum_down_payment']},
+        loan_term = {request.json['loan_term']}
+    WHERE
+        id = {bank_id}
+    """
+    db_query(connection, query)
+    return "edit successful", 200
 
 @app.route('/api/delete_bank/<int:bank_id>', methods=['DELETE'])
 def delete_bank(bank_id):
-    bank = list(filter(lambda temp: temp['id'] == bank_id, banks))
-    if len(bank) == 0:
-        abort(404)
-    banks.remove(bank[0])
+    query = f"DELETE from banks WHERE id = {bank_id}"
+    db_query(connection, query)
     return jsonify({'result':True})
     
     
